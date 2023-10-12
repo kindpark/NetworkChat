@@ -107,7 +107,29 @@ public class ChatInterface extends JFrame implements ActionListener, Runnable {
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
-		
+		ParticipantData pd = null;
+		while(true) {
+			try {
+				pd = (ParticipantData) input.readObject();
+				//exit를 서버로부터 받으면 종료
+				if(pd.getCommand() == Info.EXIT) {
+					input.close();
+					output.close();
+					socket.close();
+					System.exit(0);
+				}
+				//커멘드를 받으면 채팅창에 반영
+				else if(pd.getCommand() == Info.SEND) {
+					jta.append(pd.getChat() + "\n");
+					int length = jtf.getText().length();
+					jta.setCaretPosition(length);
+				}
+			}catch(IOException e){
+				e.printStackTrace();
+			}catch(ClassNotFoundException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 	
 }
