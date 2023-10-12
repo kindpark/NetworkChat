@@ -12,11 +12,11 @@ import java.io.*;
 import java.net.*;
 import java.io.*;
 
-public class ChatInterface extends JFrame implements ActionListener {
+public class ChatInterface extends JFrame implements ActionListener, Runnable {
 	private JTextArea jta; 
 	private JTextField jtf; 
 	private Socket socket;
-	private JButton button;
+	public JButton button;
 	private JList jlist;
 	private DefaultListModel<String> participant;
 	private String nickName;
@@ -71,6 +71,10 @@ public class ChatInterface extends JFrame implements ActionListener {
 				}
 			}
 		});
+		Thread thread = new Thread(this);
+		thread.start();
+		input.addActionListener(this);
+		button.addActionListener(this);
 	}
 	public static void main(String[] args) 
 	{
@@ -100,44 +104,10 @@ public class ChatInterface extends JFrame implements ActionListener {
 				e1.printStackTrace();
 			}
 	}
-	//부낳
-	/*
-	public void network() {
-		String serverIP = JOptionPane.showInputDialog(this, "서버 ip 입력", "192.168.0.1");
-		if(serverIP == null || serverIP.length() == 0) {
-			System.out.println("서버 ip 정보가 없습니다.");
-			System.exit(0);
-		}
-		nickName = JOptionPane.showInputDialog(this, "닉네임을 입력하세요", "닉네임", JOptionPane.INFORMATION_MESSAGE);
-		if(nickName == null || nickName.length() == 0) {
-			nickName = "anonymous";
-		}
-		try {
-			//9500은 무슨 뜻인가?
-			
-			socket = new Socket(serverIP, 9500);
-			input = new ObjectInputStream(socket.getInputStream());
-			output = new ObjectOutputStream(socket.getOutputStream());
-			
-			
-		}catch(UnknownHostException e) {
-			JOptionPane.showConfirmDialog(this, "서버를 찾을 수 없습니다.");
-			e.printStackTrace();
-			System.exit(0);
-		}catch(IOException e) {
-			JOptionPane.showConfirmDialog(this, "서버에 연결되어 있지 않습니다.");
-			e.printStackTrace();
-			System.exit(0);
-		}
-		try {
-			ParticipantData pd = new ParticipantData();
-			pd.setCommand(Info.SEND);
-			pd.setNickName(nickName);
-			output.writeObject(pd);
-			output.flush();
-		}catch(IOException e) {
-			e.printStackTrace();
-		}
+	@Override
+	public void run() {
+		// TODO Auto-generated method stub
+		
 	}
-	*/
+	
 }

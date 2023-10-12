@@ -4,8 +4,10 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.*;
 import ChatInterface.*;
+
+import javax.swing.AbstractButton;
 import javax.swing.JOptionPane;
-public class Network {
+public class Network{
 	static Socket socket;
 	static Info info;
 	static ChatInterface cif;
@@ -29,11 +31,11 @@ public class Network {
 			
 			
 		}catch(UnknownHostException e) {
-			JOptionPane.showConfirmDialog(this, "서버를 찾을 수 없습니다.");
+			JOptionPane.showConfirmDialog(cif, "서버를 찾을 수 없습니다.");
 			e.printStackTrace();
 			System.exit(0);
 		}catch(IOException e) {
-			JOptionPane.showConfirmDialog(this, "서버에 연결되어 있지 않습니다.");
+			JOptionPane.showConfirmDialog(cif, "서버에 연결되어 있지 않습니다.");
 			e.printStackTrace();
 			System.exit(0);
 		}
@@ -41,8 +43,8 @@ public class Network {
 			ParticipantData pd = new ParticipantData();
 			pd.setCommand(Info.SEND);
 			pd.setNickName(nickName);
-			output.writeObject(pd);
-			output.flush();
+			cif.output.writeObject(pd);
+			cif.output.flush();
 		}catch(IOException e) {
 			e.printStackTrace();
 		}
