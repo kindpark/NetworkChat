@@ -12,10 +12,9 @@ import java.io.*;
 import java.net.*;
 import java.io.*;
 
-public class ChatInterface extends JFrame implements ActionListener, Runnable {
-	private JTextArea jta; 
-	private JTextField jtf; 
-	private Socket socket;
+public class ChatInterface extends JFrame implements ActionListener{
+	public JTextArea jta; 
+	public JTextField jtf; 
 	public JButton button;
 	private JList jlist;
 	private DefaultListModel<String> participant;
@@ -71,9 +70,9 @@ public class ChatInterface extends JFrame implements ActionListener, Runnable {
 				}
 			}
 		});
-		Thread thread = new Thread(this);
-		thread.start();
-		input.addActionListener(this);
+		//Thread thread = new Thread(this);
+		//thread.start();
+		jtf.addActionListener(this);
 		button.addActionListener(this);
 	}
 	public static void main(String[] args) 
@@ -104,6 +103,7 @@ public class ChatInterface extends JFrame implements ActionListener, Runnable {
 				e1.printStackTrace();
 			}
 	}
+	/*
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
@@ -131,5 +131,5 @@ public class ChatInterface extends JFrame implements ActionListener, Runnable {
 			}
 		}
 	}
-	
+	*/
 }

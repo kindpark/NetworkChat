@@ -25,7 +25,7 @@ public class Network{
 		try {
 			//9500은 무슨 뜻인가?
 			
-			socket = new Socket(serverIP, 9500);
+			socket = new Socket(serverIP, 8888);
 			cif.input = new ObjectInputStream(socket.getInputStream());
 			cif.output = new ObjectOutputStream(socket.getOutputStream());
 			
