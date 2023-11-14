@@ -10,27 +10,48 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.net.*;
+import java.util.*;
 import java.io.*;
 
-public class ChatInterface extends JFrame implements ActionListener{
+public class ChatInterface extends JFrame implements ActionListener, Runnable{
 	public JTextArea jta; 
+	private Socket socket;
+	//Text를 JList로 받아서 수정, 코멘트 가능하도록
+	private JList chatlog;
 	public JTextField jtf; 
 	public JButton button;
 	private JList jlist;
 	private DefaultListModel<String> participant;
+	private DefaultListModel<String> chatlist;
 	private String nickName;
 	public ObjectInputStream input = null;
 	public ObjectOutputStream output = null;
 	public ChatInterface() {
 		//센터에 TextArea만들기
 		jta = new JTextArea();
+		/*
+		chatlog = new JList<>();
+		chatlist = new DefaultListModel<>();
+		for(int i = 0; i < 50; i++)
+			chatlist.addElement("대화대화대화" + i);
+		chatlog.setModel(chatlist);;
+		chatlog.addMouseListener(new MouseAdapter() {	
+			@Override
+			public void mousePressed(MouseEvent e) {
+				if(e.getButton() == MouseEvent.BUTTON1) {
+					chatlist.addElement(chatlog.getName());
+				}
+			}
+		});
+		*/
 		jta.setEditable(false);
 		JScrollPane scroll = new JScrollPane(jta);
 		//스크롤바 세로 조정
 		scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);  //항상 스크롤바가 세로로 떠있음
 		jlist = new JList<>();
 		participant = new DefaultListModel<>();
-		participant.addElement("adasdas");
+		for(int i = 0; i < 20; i++) 
+			participant.addElement("adasdas");
 		jlist.setModel(participant);
 		JLabel ppl = new JLabel("참가자");
 		ppl.setLayout(new BorderLayout());
@@ -70,8 +91,8 @@ public class ChatInterface extends JFrame implements ActionListener{
 				}
 			}
 		});
-		//Thread thread = new Thread(this);
-		//thread.start();
+		Thread thread = new Thread(this);
+		thread.start();
 		jtf.addActionListener(this);
 		button.addActionListener(this);
 	}
@@ -103,7 +124,7 @@ public class ChatInterface extends JFrame implements ActionListener{
 				e1.printStackTrace();
 			}
 	}
-	/*
+	
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
@@ -131,5 +152,5 @@ public class ChatInterface extends JFrame implements ActionListener{
 			}
 		}
 	}
-	*/
+	
 }

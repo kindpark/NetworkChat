@@ -1,5 +1,6 @@
 package ChatInterface;
-
+//유저 닉네임, 채팅, 커멘드 저장 데이터베이스
+//일회성이 있어 추후 sql등 연동하면 좋을듯
 public class ParticipantData {
 	private String nickname;
 	private String chat;
