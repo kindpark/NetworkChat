@@ -1,17 +1,11 @@
 package ChatInterface;
 import javax.swing.*;
 
-import Network.Network;
-
-//import Network.ObjectInputStream;
-//import Network.ObjectOutputStream;
-
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.net.*;
-import java.util.*;
-import java.io.*;
+
 
 public class ChatInterface extends JFrame implements ActionListener, Runnable{
 	public JTextArea jta; 
@@ -29,29 +23,13 @@ public class ChatInterface extends JFrame implements ActionListener, Runnable{
 	public ChatInterface() {
 		//센터에 TextArea만들기
 		jta = new JTextArea();
-		/*
-		chatlog = new JList<>();
-		chatlist = new DefaultListModel<>();
-		for(int i = 0; i < 50; i++)
-			chatlist.addElement("대화대화대화" + i);
-		chatlog.setModel(chatlist);;
-		chatlog.addMouseListener(new MouseAdapter() {	
-			@Override
-			public void mousePressed(MouseEvent e) {
-				if(e.getButton() == MouseEvent.BUTTON1) {
-					chatlist.addElement(chatlog.getName());
-				}
-			}
-		});
-		*/
 		jta.setEditable(false);
 		JScrollPane scroll = new JScrollPane(jta);
 		//스크롤바 세로 조정
 		scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);  //항상 스크롤바가 세로로 떠있음
 		jlist = new JList<>();
 		participant = new DefaultListModel<>();
-		for(int i = 0; i < 20; i++) 
-			participant.addElement("adasdas");
+		participant.addElement("adasdas");
 		jlist.setModel(participant);
 		JLabel ppl = new JLabel("참가자");
 		ppl.setLayout(new BorderLayout());
@@ -68,53 +46,45 @@ public class ChatInterface extends JFrame implements ActionListener, Runnable{
 		button = new JButton("전송");
 		enterChat.add("Center", jtf); 
 		enterChat.add("East", button);  
-		
-		participant = new DefaultListModel<>();
+	
 		Container container = this.getContentPane();
 		container.add("Center", chatLog);
 		container.add("South", enterChat);  
 		setBounds(400, 400, 400, 400);
 		setVisible(true);
-		setDefaultCloseOperation(EXIT_ON_CLOSE);
-		//윈도우 이벤트
-		
+
 		this.addWindowListener(new WindowAdapter(){
 			public void windowClosing(WindowEvent e){ 
 				try{
 					ParticipantData pd = new ParticipantData();
-					pd.setNickName(nickName);
-					pd.setCommand(Info.EXIT);
-					output.writeObject(pd);  //역슬러쉬가 필요가 없음
+					pd.setName(nickName);
+					pd.setManage(Command.EXIT);
+					output.writeObject(pd);
 					output.flush();
 				}catch(IOException io){
 					io.printStackTrace();
 				}
 			}
 		});
-		Thread thread = new Thread(this);
-		thread.start();
-		jtf.addActionListener(this);
-		button.addActionListener(this);
 	}
+	
 	public static void main(String[] args) 
 	{
-		Network nw = new Network();
-		new ChatInterface();
-		nw.network();
+		new ChatInterface().service();
 	}
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
 		try {
-			String msg = jta.getText();
+			String message = jtf.getText();
 			ParticipantData pd = new ParticipantData();
-			if(msg.equals("out")) {
-				pd.setCommand(Info.EXIT);
+			if(message.equals("out")) {
+				pd.setManage(Command.EXIT);
 			}
 			else {
-				pd.setCommand(Info.SEND);
-				pd.setChat(msg);
-				pd.setNickName(nickName);
+				pd.setManage(Command.SEND);
+				pd.setChat(message);
+				pd.setName(nickName);
 			}
 				output.writeObject(pd);
 				output.flush();
@@ -133,16 +103,16 @@ public class ChatInterface extends JFrame implements ActionListener, Runnable{
 			try {
 				pd = (ParticipantData) input.readObject();
 				//exit를 서버로부터 받으면 종료
-				if(pd.getCommand() == Info.EXIT) {
+				if(pd.getManage() == Command.EXIT) {
 					input.close();
 					output.close();
 					socket.close();
 					System.exit(0);
 				}
 				//커멘드를 받으면 채팅창에 반영
-				else if(pd.getCommand() == Info.SEND) {
+				else if(pd.getManage() == Command.SEND) {
 					jta.append(pd.getChat() + "\n");
-					int length = jtf.getText().length();
+					int length = jta.getText().length();
 					jta.setCaretPosition(length);
 				}
 			}catch(IOException e){
@@ -152,5 +122,47 @@ public class ChatInterface extends JFrame implements ActionListener, Runnable{
 			}
 		}
 	}
-	
+	public void service(){
+		//서버 IP 입력받기
+		//String serverIP = JOptionPane.showInputDialog(this, "서버IP를 입력하세요","서버IP",JOptionPane.INFORMATION_MESSAGE);
+		String serverIP= JOptionPane.showInputDialog(this,"서버IP를 입력하세요","192.168.0.16");  //기본적으로 아이피 값이 입력되어 들어가게 됨
+		if(serverIP==null || serverIP.length()==0){  //만약 값이 입력되지 않았을 때 창이 꺼짐
+			JOptionPane.showMessageDialog(null, "IP 정보가 없습니다.");
+			System.exit(0);
+		}
+		nickName= JOptionPane.showInputDialog(this,"닉네임을 입력하세요","닉네임" ,JOptionPane.INFORMATION_MESSAGE);
+		if(nickName == null || nickName.length()==0){
+			nickName="guest";
+		}
+		try{
+			socket = new Socket(serverIP,1234);
+			//에러 발생
+			input= new ObjectInputStream(socket.getInputStream());
+			output = new ObjectOutputStream(socket.getOutputStream());
+			JOptionPane.showMessageDialog(null, "전송 준비 완료!"); 
+			
+		} catch(UnknownHostException e ){
+			JOptionPane.showMessageDialog(null, "서버를 찾을 수 없습니다.");
+			e.printStackTrace();
+			System.exit(0);
+		} catch(IOException e){
+			JOptionPane.showMessageDialog(null, "서버와 연결이 안되었습니다.");
+			e.printStackTrace();
+			System.exit(0);
+		}
+		try{
+			ParticipantData data = new ParticipantData();
+			data.setManage(Command.JOIN);
+			data.setName(nickName);
+			output.writeObject(data); 
+			output.flush();
+		}catch(IOException e){
+			e.printStackTrace();
+		}
+		
+		Thread t = new Thread(this);
+		t.start();
+		jtf.addActionListener(this);
+		button.addActionListener(this);  //멕션 이벤트 추가
+	}
 }

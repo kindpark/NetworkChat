@@ -1,5 +1,7 @@
+
 package ChatInterface;
 
-public enum Info {
+public enum Command {
 	EXIT, SEND, JOIN;
 }
+

@@ -1,23 +1,24 @@
 package ChatInterface;
+
 //유저 닉네임, 채팅, 커멘드 저장 데이터베이스
 //일회성이 있어 추후 sql등 연동하면 좋을듯
 public class ParticipantData {
-	private String nickname;
+	private String name;
 	private String chat;
-	private Info command;
+	private Command manage;
 	
-	public String getNickName(){
-		return nickname;
+	public String getName(){
+		return name;
 	}
-	public void setNickName(String nickName){
-		this.nickname= nickName;
+	public void setName(String name){
+		this.name= name;
 	}
 	
-	public void setCommand(Info command){
-		this.command= command;
+	public void setManage(Command man){
+		this.manage= man;
 	}
-	public Info getCommand(){
-		return command;
+	public Command getManage(){
+		return manage;
 	}
 	public void setChat(String message){
 		this.chat = message; 
