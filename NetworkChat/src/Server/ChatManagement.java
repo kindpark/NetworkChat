@@ -3,14 +3,13 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 import ChatInterface.*;
-
 public class ChatManagement extends Thread {
 	private ObjectInputStream oor;
 	private ObjectOutputStream oow;
 	private Socket socket;
 	private List <ChatManagement> list;
 	//»ý¼ºÀÚ
-	public ChatManagement(Socket socket, List <ChatManagement> list) throws IOException {
+	public ChatManagement(Socket socket, List<ChatManagement> list) throws IOException {
 		
 		this.socket = socket;
 		this.list = list;

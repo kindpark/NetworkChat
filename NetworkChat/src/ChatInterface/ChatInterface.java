@@ -8,16 +8,15 @@ import java.net.*;
 
 
 public class ChatInterface extends JFrame implements ActionListener, Runnable{
-	public JTextArea jta; 
-	private Socket socket;
+	private JTextArea jta; 
 	//Text를 JList로 받아서 수정, 코멘트 가능하도록
 	private JList chatlog;
 	public JTextField jtf; 
 	public JButton button;
 	private JList jlist;
 	private DefaultListModel<String> participant;
-	private DefaultListModel<String> chatlist;
-	private String nickName;
+	private String name;
+	private Socket socket;
 	public ObjectInputStream input = null;
 	public ObjectOutputStream output = null;
 	public ChatInterface() {
@@ -29,7 +28,6 @@ public class ChatInterface extends JFrame implements ActionListener, Runnable{
 		scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);  //항상 스크롤바가 세로로 떠있음
 		jlist = new JList<>();
 		participant = new DefaultListModel<>();
-		participant.addElement("adasdas");
 		jlist.setModel(participant);
 		JLabel ppl = new JLabel("참가자");
 		ppl.setLayout(new BorderLayout());
@@ -57,7 +55,7 @@ public class ChatInterface extends JFrame implements ActionListener, Runnable{
 			public void windowClosing(WindowEvent e){ 
 				try{
 					ParticipantData pd = new ParticipantData();
-					pd.setName(nickName);
+					pd.setName(name);
 					pd.setManage(Command.EXIT);
 					output.writeObject(pd);
 					output.flush();
@@ -84,7 +82,7 @@ public class ChatInterface extends JFrame implements ActionListener, Runnable{
 			else {
 				pd.setManage(Command.SEND);
 				pd.setChat(message);
-				pd.setName(nickName);
+				pd.setName(name);
 			}
 				output.writeObject(pd);
 				output.flush();
@@ -94,7 +92,42 @@ public class ChatInterface extends JFrame implements ActionListener, Runnable{
 				e1.printStackTrace();
 			}
 	}
-	
+	public void service(){
+		name= JOptionPane.showInputDialog(this,"닉네임을 입력하세요","닉네임" ,JOptionPane.INFORMATION_MESSAGE);
+		if(name == ""){
+			name="손님";
+		}
+		try{
+			socket = new Socket("192.168.0.16",8500);
+			//에러 발생
+			input= new ObjectInputStream(socket.getInputStream());
+			output = new ObjectOutputStream(socket.getOutputStream());
+			
+		} catch(UnknownHostException e ){
+			jta.setText("서버를 찾을 수 없습니다.");
+			e.printStackTrace();
+			System.exit(0);
+		} catch(IOException e){
+			jta.setText("현재 서버가 없습니다.");
+			e.printStackTrace();
+			System.exit(0);
+		}
+		try{
+			ParticipantData data = new ParticipantData();
+			data.setManage(Command.JOIN);
+			data.setName(name);
+			participant.addElement(name);
+			output.writeObject(data); 
+			output.flush();
+		}catch(IOException e){
+			e.printStackTrace();
+		}
+		
+		Thread t = new Thread(this);
+		t.start();
+		jtf.addActionListener(this);
+		button.addActionListener(this);  //멕션 이벤트 추가
+	}
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
@@ -121,48 +154,5 @@ public class ChatInterface extends JFrame implements ActionListener, Runnable{
 				e.printStackTrace();
 			}
 		}
-	}
-	public void service(){
-		//서버 IP 입력받기
-		//String serverIP = JOptionPane.showInputDialog(this, "서버IP를 입력하세요","서버IP",JOptionPane.INFORMATION_MESSAGE);
-		String serverIP= JOptionPane.showInputDialog(this,"서버IP를 입력하세요","192.168.0.16");  //기본적으로 아이피 값이 입력되어 들어가게 됨
-		if(serverIP==null || serverIP.length()==0){  //만약 값이 입력되지 않았을 때 창이 꺼짐
-			JOptionPane.showMessageDialog(null, "IP 정보가 없습니다.");
-			System.exit(0);
-		}
-		nickName= JOptionPane.showInputDialog(this,"닉네임을 입력하세요","닉네임" ,JOptionPane.INFORMATION_MESSAGE);
-		if(nickName == null || nickName.length()==0){
-			nickName="guest";
-		}
-		try{
-			socket = new Socket(serverIP,1234);
-			//에러 발생
-			input= new ObjectInputStream(socket.getInputStream());
-			output = new ObjectOutputStream(socket.getOutputStream());
-			JOptionPane.showMessageDialog(null, "전송 준비 완료!"); 
-			
-		} catch(UnknownHostException e ){
-			JOptionPane.showMessageDialog(null, "서버를 찾을 수 없습니다.");
-			e.printStackTrace();
-			System.exit(0);
-		} catch(IOException e){
-			JOptionPane.showMessageDialog(null, "서버와 연결이 안되었습니다.");
-			e.printStackTrace();
-			System.exit(0);
-		}
-		try{
-			ParticipantData data = new ParticipantData();
-			data.setManage(Command.JOIN);
-			data.setName(nickName);
-			output.writeObject(data); 
-			output.flush();
-		}catch(IOException e){
-			e.printStackTrace();
-		}
-		
-		Thread t = new Thread(this);
-		t.start();
-		jtf.addActionListener(this);
-		button.addActionListener(this);  //멕션 이벤트 추가
 	}
 }
