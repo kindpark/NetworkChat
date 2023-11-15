@@ -61,8 +61,8 @@ public class Server extends JFrame{
 			enterChat.setLayout(new BorderLayout());
 			button1 = new JButton("시작");
 			button2 = new JButton("종료");
-			enterChat.add(button1); 
-			enterChat.add(button2);  
+			enterChat.add("West", button1); 
+			enterChat.add("East", button2);  
 		
 			Container container = this.getContentPane();
 			container.add("Center", chatLog);
